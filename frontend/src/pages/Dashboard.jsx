@@ -30,10 +30,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Dashboard = () => {
-  const { token, logout } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [applications, setApplications] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +70,7 @@ const Dashboard = () => {
     setIsLoading(true);
     try {
       const newApp = await submitApplication(form, token);
-      setApplications((prev) => [...prev, newApp.application]);
+      setApplications((prev) => [newApp, ...prev]);
       setForm({ service_name: "", reason: "", payment_plan: "" });
       setShowForm(false);
       toast.success("Application submitted successfully!");

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { io } from "socket.io-client";
 import { AuthContext } from "./AuthContext";
 
@@ -15,7 +16,7 @@ export const useWebSocket = () => {
 };
 
 export const WebSocketProvider = ({ children }) => {
-  const { user, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);

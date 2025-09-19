@@ -28,10 +28,10 @@ export const fetchNotifications = async (token) => {
 };
 
 export const markNotificationRead = async (id, token) => {
-  const res = await axios.patch(`${API_URL}/api/notifications/${id}/read`, null, {
+  const response = await axios.patch(`${API_URL}/api/notifications/${id}/read`, null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.data.notification;
+  return response.data.notification;
 };
