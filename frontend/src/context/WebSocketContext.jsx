@@ -88,15 +88,28 @@ export const WebSocketProvider = ({ children }) => {
             }
           );
 
-          if (response.ok) {
-            const data = await response.json();
-            setNotifications(data.notifications || []);
-            setUnreadCount(
-              data.notifications?.filter((n) => !n.is_read).length || 0
-            );
-          }
+          const data = response.data;
+          setNotifications(data.notifications || []);
+          setUnreadCount(
+            data.notifications?.filter((n) => !n.is_read).length || 0
+          );
         } catch (error) {
-          console.error("Failed to load notifications:", error);
+          if (error.response) {
+            // Server responded with error status
+            console.error(
+              "Failed to load notifications:",
+              error.response.status
+            );
+            console.error(error.response.data);
+          } else if (error.request) {
+            // Request was made but no response received (network issues)
+            console.error(
+              "Failed to load notifications: No response from server"
+            );
+          } else {
+            // Something else happened
+            console.error("Failed to load notifications:", error.message);
+          }
         }
       }
     };
@@ -106,8 +119,9 @@ export const WebSocketProvider = ({ children }) => {
 
   const markAsRead = async (notificationId) => {
     try {
-      const response = await axios.patch(
-        `${API_URL}/api/notifications/${notificationId}/read`, // url
+      await axios.patch(
+        `${API_URL}/api/notifications/${notificationId}/read`,
+        {}, // empty body (or null)
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,23 +129,37 @@ export const WebSocketProvider = ({ children }) => {
         }
       );
 
-      if (response.ok) {
-        setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === notificationId ? { ...notif, is_read: true } : notif
-          )
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      }
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === notificationId ? { ...notif, is_read: true } : notif
+        )
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error("Failed to mark notification as read:", error);
+      if (error.response) {
+        // Server responded with error status
+        console.error(
+          "Failed to mark notification as read:",
+          error.response.status
+        );
+        console.error(error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received (network issues)
+        console.error(
+          "Failed to mark notification as read: No response from server"
+        );
+      } else {
+        // Something else happened
+        console.error("Failed to mark notification as read:", error.message);
+      }
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const response = await axios.patch(
-        `${API_URL}/api/notifications/mark-all-read`, // url
+      await axios.patch(
+        `${API_URL}/api/notifications/mark-all-read`,
+        {}, // empty body (or null)
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -139,14 +167,30 @@ export const WebSocketProvider = ({ children }) => {
         }
       );
 
-      if (response.ok) {
-        setNotifications((prev) =>
-          prev.map((notif) => ({ ...notif, is_read: true }))
-        );
-        setUnreadCount(0);
-      }
+      setNotifications((prev) =>
+        prev.map((notif) => ({ ...notif, is_read: true }))
+      );
+      setUnreadCount(0);
     } catch (error) {
-      console.error("Failed to mark all notifications as read:", error);
+      if (error.response) {
+        // Server responded with error status
+        console.error(
+          "Failed to mark all notifications as read:",
+          error.response.status
+        );
+        console.error(error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received (network issues)
+        console.error(
+          "Failed to mark all notifications as read: No response from server"
+        );
+      } else {
+        // Something else happened
+        console.error(
+          "Failed to mark all notifications as read:",
+          error.message
+        );
+      }
     }
   };
 
@@ -159,20 +203,28 @@ export const WebSocketProvider = ({ children }) => {
         }
       );
 
-      if (response.ok) {
-        const notificationToDelete = notifications.find(
-          (n) => n.id === notificationId
-        );
-        setNotifications((prev) =>
-          prev.filter((notif) => notif.id !== notificationId)
-        );
+      const notificationToDelete = notifications.find(
+        (n) => n.id === notificationId
+      );
+      setNotifications((prev) =>
+        prev.filter((notif) => notif.id !== notificationId)
+      );
 
-        if (notificationToDelete && !notificationToDelete.is_read) {
-          setUnreadCount((prev) => Math.max(0, prev - 1));
-        }
+      if (notificationToDelete && !notificationToDelete.is_read) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error("Failed to delete notification:", error);
+      if (error.response) {
+        // Server responded with error status
+        console.error("Failed to delete notification:", error.response.status);
+        console.error(error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received (network issues)
+        console.error("Failed to delete notification: No response from server");
+      } else {
+        // Something else happened
+        console.error("Failed to delete notification:", error.message);
+      }
     }
   };
 
