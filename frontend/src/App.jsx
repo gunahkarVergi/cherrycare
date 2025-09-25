@@ -125,8 +125,11 @@ function Navigation({ user }) {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button and notifications */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Show notifications on mobile if user is logged in */}
+            {user && <NotificationDropdown />}
+
             <Button
               variant="ghost"
               size="sm"
