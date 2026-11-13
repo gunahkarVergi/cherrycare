@@ -73,6 +73,32 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:5000`
 
+## 🏗️ Build, Test and Run
+
+The repository is an npm workspaces monorepo (`backend/`, `frontend/`) managed from the root `package.json`.
+
+**Requirements:** Node.js >= 20.19, npm >= 10, PostgreSQL 14+.
+
+| Task | Command |
+|---|---|
+| Install all dependencies (single root lockfile) | `npm install` |
+| Run backend in dev mode | `npm run dev:backend` |
+| Run frontend in dev mode | `npm run dev:frontend` |
+| Production build of the frontend (`frontend/dist`) | `npm run build` |
+| Lint | `npm run lint` |
+| Test | `npm test` |
+| Package both workspaces as `.tgz` into `artifacts/` | `npm run package` |
+| Bump patch version in all packages | `npm run release:patch` |
+| Clean build outputs | `npm run clean` |
+
+**Reproducible build from a fresh clone:**
+```bash
+git clone https://github.com/gunahkarVergi/cherrycare.git && cd cherrycare
+npm ci && npm run build && npm run package
+```
+
+Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` before running.
+
 ## 🗄️ Database Schema
 
 ### Users Table
