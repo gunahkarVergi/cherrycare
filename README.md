@@ -33,12 +33,25 @@ A modern web application for managing healthcare financing applications with rea
 - **PostgreSQL** - Primary database
 - **pg** - PostgreSQL client for Node.js
 
-## 🚀 Quick Start
+### Cache
+- **Redis** - In-memory data store
+- **redis** - Redis client for Node.js (`REDIS_URL`, defaults to `redis://localhost:6379`)
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 14+
-- npm or yarn
+### Build and Automation
+- **npm workspaces** - Monorepo management (`backend/`, `frontend/`) from a single root `package.json` and a single root `package-lock.json`
+
+## 📋 Prerequisites
+
+| Requirement | Version |
+|---|---|
+| Node.js | >= 20.19 |
+| npm | >= 10 |
+| PostgreSQL | 14+ (only needed to run the application, not to build it) |
+| Redis | A running instance, reachable at `REDIS_URL` (only needed to run the backend, not to build it) |
+
+> Yarn and pnpm are not supported: the lockfile and the scripts are npm-specific.
+
+## 🚀 Getting Started
 
 ### 1. Clone the repository
 ```bash
@@ -46,58 +59,91 @@ git clone https://github.com/gunahkarVergi/cherrycare.git
 cd cherrycare
 ```
 
-### 2. Setup Database
-Create a PostgreSQL database named `cherrycare` and run the SQL schema provided below.
+### 2. Set up the database
+Create a PostgreSQL database named `cherrycare` and run the SQL schema from the [Database Schema](#️-database-schema) section.
 
-### 3. Setup Backend
+### 3. Start Redis
+The backend connects to Redis at startup and will fail to start if it is unreachable. Use a local install or, for example, Docker:
 ```bash
-cd backend
+docker run -d --name cherrycare-redis -p 6379:6379 redis:7
+```
+
+### 4. Configure environment variables
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+Then edit both files (see [Environment Variables](#-environment-variables)).
+
+### 5. Install dependencies
+Run once from the repository root. This installs the dependencies of both workspaces:
+```bash
 npm install
 ```
 
-Create `.env` file with the environment variables listed below.
-
-Start backend:
+### 6. Start in development mode
+Use two terminals, both from the repository root:
 ```bash
-npm run dev
+npm run dev:backend    # http://localhost:5000
+npm run dev:frontend   # http://localhost:5173
 ```
-
-### 4. Setup Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 5. Access the application
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:5000`
 
 ## 🏗️ Build, Test and Run
 
-The repository is an npm workspaces monorepo (`backend/`, `frontend/`) managed from the root `package.json`.
+The repository is an npm workspaces monorepo managed from the root `package.json`. All tasks are run from the repository root.
 
-**Requirements:** Node.js >= 20.19, npm >= 10, PostgreSQL 14+, Redis.
+| Task | Command | Notes |
+|---|---|---|
+| Install dependencies (development) | `npm install` | Resolves both workspaces into one root `node_modules` |
+| Install dependencies (reproducible) | `npm ci` | Installs exactly what `package-lock.json` specifies; used for CI and clean builds |
+| Run backend in dev mode | `npm run dev:backend` | |
+| Run frontend in dev mode | `npm run dev:frontend` | |
+| Run backend in production mode | `npm start` | Starts the backend workspace; requires a configured `backend/.env`, a running PostgreSQL and a running Redis |
+| Build | `npm run build` | Production build of the frontend with Vite into `frontend/dist`. The backend is plain Node.js and has no compile step |
+| Lint | `npm run lint` | Currently lints the frontend workspace |
+| Test | `npm test` | Runs `test` in every workspace that defines one (`--if-present`). No tests are defined yet; test automation is planned |
+| Package | `npm run package` | Builds, then writes one `.tgz` per workspace into `artifacts/` |
+| Bump version | `npm run release:patch` | Bumps the patch version in the root and both workspaces (see below) |
+| Clean | `npm run clean` | Removes `artifacts/` and `frontend/dist` |
 
-| Task | Command |
-|---|---|
-| Install all dependencies (single root lockfile) | `npm install` |
-| Run backend in dev mode | `npm run dev:backend` |
-| Run frontend in dev mode | `npm run dev:frontend` |
-| Production build of the frontend (`frontend/dist`) | `npm run build` |
-| Lint | `npm run lint` |
-| Test | `npm test` |
-| Package both workspaces as `.tgz` into `artifacts/` | `npm run package` |
-| Bump patch version in all packages | `npm run release:patch` |
-| Clean build outputs | `npm run clean` |
+> `clean` and `package` use `rm -rf` and `mkdir -p`; on Windows run them from Git Bash or WSL.
 
-**Reproducible build from a fresh clone:**
+### Reproducible build from a fresh clone
+
+No database is needed to build and package:
+
 ```bash
 git clone https://github.com/gunahkarVergi/cherrycare.git && cd cherrycare
 npm ci && npm run build && npm run package
 ```
 
-Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` before running.
+Expected result: `frontend/dist/` (static site) and `artifacts/*.tgz` (backend and frontend packages).
+
+### Running the production build
+
+```bash
+npm run build      # produces frontend/dist
+npm start          # starts the backend on the port configured in backend/.env
+```
+`frontend/dist` is a static site and can be served by any static file server or hosting service. Set `VITE_API_URL` in `frontend/.env` **before** building, because Vite embeds it at build time.
+
+### Version management
+
+Versions follow [Semantic Versioning](https://semver.org/) and are kept identical in the root `package.json`, `backend/package.json` and `frontend/package.json`. The lockfile is updated at the same time.
+
+```bash
+npm run release:patch                                                  # 1.0.0 -> 1.0.1
+npm version minor --workspaces --include-workspace-root --no-git-tag-version   # 1.0.0 -> 1.1.0
+npm version major --workspaces --include-workspace-root --no-git-tag-version   # 1.0.0 -> 2.0.0
+```
+Release notes are recorded manually in [`CHANGELOG.md`](CHANGELOG.md) ([Keep a Changelog](https://keepachangelog.com/) format). `--no-git-tag-version` means no commit or tag is created automatically: commit and tag (`git tag v1.0.1`) yourself after bumping.
+
+### Packaging
+
+`npm run package` runs `npm pack` for the `backend` and `frontend` workspaces and places the archives in `artifacts/` (ignored by Git). To inspect an archive:
+```bash
+tar -tzf artifacts/<archive-name>.tgz
+```
 
 ## 🗄️ Database Schema
 
@@ -143,7 +189,9 @@ CREATE TABLE notifications (
 
 ## 🔧 Environment Variables
 
-### Backend (.env)
+Copy the `.env.example` files as described in [Getting Started](#4-configure-environment-variables).
+
+### Backend (`backend/.env`)
 ```env
 DB_USER=your_database_user
 DB_HOST=localhost
@@ -151,11 +199,12 @@ DB_NAME=cherrycare
 DB_PASSWORD=your_database_password
 DB_PORT=5432
 JWT_SECRET=your_super_secret_jwt_key
+REDIS_URL=redis://localhost:6379
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 ```
 
-### Frontend (.env)
+### Frontend (`frontend/.env`)
 ```env
 VITE_API_URL=http://localhost:5000
 ```
