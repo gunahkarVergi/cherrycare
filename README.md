@@ -100,7 +100,7 @@ The repository is an npm workspaces monorepo managed from the root `package.json
 | Run frontend in dev mode | `npm run dev:frontend` | |
 | Run backend in production mode | `npm start` | Starts the backend workspace; requires a configured `backend/.env`, a running PostgreSQL and a running Redis |
 | Build | `npm run build` | Production build of the frontend with Vite into `frontend/dist`. The backend is plain Node.js and has no compile step |
-| Lint | `npm run lint` | Currently lints the frontend workspace |
+| Lint | `npm run lint` | Runs ESLint on the frontend workspace. It currently reports pre-existing issues (mostly `react-refresh/only-export-components` and unused variables); fixing them is planned together with the code-quality automation work |
 | Test | `npm test` | Runs `test` in every workspace that defines one (`--if-present`). No tests are defined yet; test automation is planned |
 | Package | `npm run package` | Builds, then writes one `.tgz` per workspace into `artifacts/` |
 | Bump version | `npm run release:patch` | Bumps the patch version in the root and both workspaces (see below) |
@@ -150,40 +150,40 @@ tar -tzf artifacts/<archive-name>.tgz
 ### Users Table
 ```sql
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  role VARCHAR(20) DEFAULT 'user',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                       id SERIAL PRIMARY KEY,
+                       email VARCHAR(255) UNIQUE NOT NULL,
+                       password VARCHAR(255) NOT NULL,
+                       first_name VARCHAR(100) NOT NULL,
+                       last_name VARCHAR(100) NOT NULL,
+                       role VARCHAR(20) DEFAULT 'user',
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Applications Table
 ```sql
 CREATE TABLE financing_applications (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  service_name VARCHAR(255) NOT NULL,
-  reason TEXT NOT NULL,
-  payment_plan VARCHAR(255) NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                        id SERIAL PRIMARY KEY,
+                                        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                                        service_name VARCHAR(255) NOT NULL,
+                                        reason TEXT NOT NULL,
+                                        payment_plan VARCHAR(255) NOT NULL,
+                                        status VARCHAR(20) DEFAULT 'pending',
+                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Notifications Table
 ```sql
 CREATE TABLE notifications (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  message TEXT NOT NULL,
-  type VARCHAR(50) DEFAULT 'general',
-  is_read BOOLEAN DEFAULT FALSE,
-  application_id INTEGER REFERENCES financing_applications(id) ON DELETE CASCADE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                               id SERIAL PRIMARY KEY,
+                               user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                               message TEXT NOT NULL,
+                               type VARCHAR(50) DEFAULT 'general',
+                               is_read BOOLEAN DEFAULT FALSE,
+                               application_id INTEGER REFERENCES financing_applications(id) ON DELETE CASCADE,
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
