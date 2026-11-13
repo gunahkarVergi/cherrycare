@@ -14,7 +14,7 @@ A modern web application for managing healthcare financing applications with rea
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** - UI library
+- **React 19** - UI library
 - **Vite** - Build tool
 - **TailwindCSS** - Utility-first CSS framework
 - **Shadcn/ui** - Component library
@@ -26,7 +26,7 @@ A modern web application for managing healthcare financing applications with rea
 - **Express.js** - Web framework
 - **Socket.IO** - Real-time communication
 - **JWT** - Authentication
-- **bcryptjs** - Password hashing
+- **bcrypt** - Password hashing
 - **CORS** - Cross-origin requests
 
 ### Database
@@ -150,27 +150,27 @@ tar -tzf artifacts/<archive-name>.tgz
 ### Users Table
 ```sql
 CREATE TABLE users (
-                       id SERIAL PRIMARY KEY,
-                       email VARCHAR(255) UNIQUE NOT NULL,
-                       password VARCHAR(255) NOT NULL,
-                       first_name VARCHAR(100) NOT NULL,
-                       last_name VARCHAR(100) NOT NULL,
-                       role VARCHAR(20) DEFAULT 'user',
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  role VARCHAR(20) DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Applications Table
 ```sql
 CREATE TABLE financing_applications (
-                                        id SERIAL PRIMARY KEY,
-                                        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-                                        service_name VARCHAR(255) NOT NULL,
-                                        reason TEXT NOT NULL,
-                                        payment_plan VARCHAR(255) NOT NULL,
-                                        status VARCHAR(20) DEFAULT 'pending',
-                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  service_name VARCHAR(255) NOT NULL,
+  reason TEXT NOT NULL,
+  payment_plan VARCHAR(255) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
