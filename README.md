@@ -77,7 +77,7 @@ npm run dev
 
 The repository is an npm workspaces monorepo (`backend/`, `frontend/`) managed from the root `package.json`.
 
-**Requirements:** Node.js >= 20.19, npm >= 10, PostgreSQL 14+.
+**Requirements:** Node.js >= 20.19, npm >= 10, PostgreSQL 14+, Redis.
 
 | Task | Command |
 |---|---|
