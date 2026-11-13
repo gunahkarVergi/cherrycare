@@ -1,0 +1,28 @@
+{
+  "name": "cherrycare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Healthcare financing platform: Express/PostgreSQL backend and React/Vite frontend",
+  "license": "MIT",
+  "author": "Mustafa Oguz Lulecioglu <oguzluleci@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gunahkarVergi/cherrycare.git"
+  },
+  "bugs": { "url": "https://github.com/gunahkarVergi/cherrycare/issues" },
+  "homepage": "https://github.com/gunahkarVergi/cherrycare#readme",
+  "keywords": ["healthcare", "financing", "express", "react", "vite", "socket.io"],
+  "engines": { "node": ">=20.19" },
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "start": "npm start -w backend",
+    "build": "npm run build -w frontend",
+    "lint": "npm run lint -w frontend",
+    "test": "npm test --workspaces --if-present",
+    "clean": "rm -rf artifacts frontend/dist",
+    "package": "npm run build && mkdir -p artifacts && npm pack -w backend -w frontend --pack-destination artifacts",
+    "release:patch": "npm version patch --workspaces --include-workspace-root --no-git-tag-version"
+  }
+}
