@@ -9,11 +9,25 @@
     "type": "git",
     "url": "git+https://github.com/gunahkarVergi/cherrycare.git"
   },
-  "bugs": { "url": "https://github.com/gunahkarVergi/cherrycare/issues" },
+  "bugs": {
+    "url": "https://github.com/gunahkarVergi/cherrycare/issues"
+  },
   "homepage": "https://github.com/gunahkarVergi/cherrycare#readme",
-  "keywords": ["healthcare", "financing", "express", "react", "vite", "socket.io"],
-  "engines": { "node": ">=20.19" },
-  "workspaces": ["backend", "frontend"],
+  "keywords": [
+    "healthcare",
+    "financing",
+    "express",
+    "react",
+    "vite",
+    "socket.io"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
     "dev:backend": "npm run dev -w backend",
     "dev:frontend": "npm run dev -w frontend",
@@ -24,5 +38,9 @@
     "clean": "rm -rf artifacts frontend/dist",
     "package": "npm run build && mkdir -p artifacts && npm pack -w backend -w frontend --pack-destination artifacts",
     "release:patch": "npm version patch --workspaces --include-workspace-root --no-git-tag-version"
+  },
+  "overrides": {},
+  "devDependencies": {
+    "ajv": "^8.20.0"
   }
 }
